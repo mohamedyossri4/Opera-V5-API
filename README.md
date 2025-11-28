@@ -210,58 +210,84 @@ curl http://localhost:3000/api/guests/12345
   }
   ```
 
-### Update Guest Name
+### Update Guest Information
 
-Update the guest name for a given NAME_ID:
+Update guest information by confirmation number:
 
-**Endpoint**: `PUT /api/guests/:nameId`
+**Endpoint**: `PUT /api/guests/:confirmationNo`
+
+**Headers**:
+- `Content-Type: application/json`
+- `x-api-key: your-license-key` (required for authentication)
+
+**URL Parameter**:
+- `confirmationNo` - The reservation confirmation number (numeric)
+
+**Request Body Parameters** (at least one required):
+- `first_name` (string, optional) - Guest's first name
+- `last_name` (string, optional) - Guest's last name
+- `address` (string, optional) - Guest's address
+- `doc_type` (string, optional) - Document type (e.g., "PASSPORT", "ID")
+- `doc_number` (string, optional) - Document number
 
 **Example**:
 ```bash
 curl -X PUT http://localhost:3000/api/guests/12345 \
   -H "Content-Type: application/json" \
-  -d '{"guestName": "Jane Smith"}'
+  -H "x-api-key: your-license-key" \
+  -d '{
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "address": "123 Main Street",
+    "doc_type": "PASSPORT",
+    "doc_number": "AB123456"
+  }'
 ```
 
-**Request Body**:
+**Request Body** (you can update one or more fields):
 ```json
 {
-  "guestName": "Jane Smith"
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "address": "123 Main Street",
+  "doc_type": "PASSPORT",
+  "doc_number": "AB123456"
 }
 ```
 
 **Success Response** (200):
 ```json
 {
-  "nameId": 12345,
-  "guestName": "Jane Smith",
-  "message": "Guest name updated successfully"
+  "confirmationNo": 12345,
+  "nameId": 67890,
+  "updatedFields": ["first_name", "last_name", "address", "doc_type", "doc_number"],
+  "message": "Guest information updated successfully"
 }
 ```
 
 **Error Responses**:
 
-- **400 Bad Request** (invalid nameId):
+- **400 Bad Request** (invalid confirmationNo):
   ```json
   {
     "error": "Bad Request",
-    "message": "nameId must be a valid numeric value"
+    "message": "confirmationNo must be a valid numeric value"
   }
   ```
 
-- **400 Bad Request** (invalid or empty guestName):
+- **400 Bad Request** (no fields provided):
   ```json
   {
     "error": "Bad Request",
-    "message": "guestName must be a non-empty string"
+    "message": "At least one field must be provided for update (first_name, last_name, address, doc_type, doc_number)"
   }
   ```
 
-- **404 Not Found** (guest doesn't exist):
+- **404 Not Found** (confirmation number doesn't exist):
   ```json
   {
     "error": "Not Found",
-    "message": "Guest with nameId 12345 not found"
+    "message": "Guest with confirmation number 12345 not found"
   }
   ```
 
