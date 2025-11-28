@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Node.js Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opera-api-backend
+    ports:
+      - "3000:3000"
+    environment:
+      # Oracle Database Connection
+      ORACLE_HOST: ${ORACLE_HOST}
+      ORACLE_PORT: ${ORACLE_PORT:-1521}
+      ORACLE_SERVICE_NAME: ${ORACLE_SERVICE_NAME}
+      ORACLE_USER: ${ORACLE_USER}
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      
+      # Application Configuration
+      PORT: 3000
+      NODE_ENV: production
+      
+      # Oracle Connection Pool Settings
+      ORACLE_POOL_MIN: ${ORACLE_POOL_MIN:-2}
+      ORACLE_POOL_MAX: ${ORACLE_POOL_MAX:-10}
+      ORACLE_POOL_INCREMENT: ${ORACLE_POOL_INCREMENT:-2}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    networks:
+      - opera-network
+
+networks:
+  opera-network:
+    driver: bridge
