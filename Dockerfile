@@ -1,9 +1,30 @@
 # Use official Node.js LTS (Long Term Support) image
 FROM node:20-alpine
 
+# Set working directory
+WORKDIR /usr/src/app
+
+# Install Oracle Instant Client dependencies
+# Required for oracledb to work
+RUN apk add --no-cache libaio libnsl libc6-compat wget unzip && \
+  mkdir -p /usr/lib/instantclient && \
+  cd /tmp && \
+  wget https://download.oracle.com/otn_software/linux/instantclient/219000/instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip && \
+  unzip instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip && \
+  mv instantclient_*_*/* /usr/lib/instantclient/ && \
+  rm -rf instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip instantclient_*_* && \
+  rm -f /usr/lib/instantclient/libclntsh.so /usr/lib/instantclient/libocci.so && \
+  ln -s /usr/lib/instantclient/libclntsh.so.21.1 /usr/lib/instantclient/libclntsh.so && \
+  ln -s /usr/lib/instantclient/libocci.so.21.1 /usr/lib/instantclient/libocci.so
+
+# Set Oracle environment variables
+ENV LD_LIBRARY_PATH=/usr/lib/instantclient
+
+# Copy package files
+COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy application source code
 COPY src ./src

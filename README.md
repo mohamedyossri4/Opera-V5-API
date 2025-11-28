@@ -417,6 +417,11 @@ ISC
 ## Support
 
 For issues or questions, please check the logs first using the troubleshooting section above.
-#   O p e r a - V 5 - A P I  
- #   O p e r a - V 5 - A P I  
- 
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+Built for Oracle Opera Hospitality v5 integration.

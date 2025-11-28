@@ -14,9 +14,9 @@ const guestController = require('../controllers/guestController');
 router.get('/:nameId', guestController.getGuest);
 
 /**
- * PUT /api/guests/:nameId
- * Update guest name by NAME_ID
+ * PUT /api/guests/:confirmationNo
+ * Update guest information by confirmation number
  */
-router.put('/:nameId', guestController.updateGuest);
+router.put('/:confirmationNo', guestController.updateGuest);
 
 module.exports = router;

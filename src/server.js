@@ -7,12 +7,20 @@ require('dotenv').config();
 const express = require('express');
 const db = require('./db/oracleClient');
 const guestRoutes = require('./routes/guestRoutes');
+const licenseValidator = require('./middleware/licenseValidator');
+const auditLogger = require('./middleware/auditLogger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+
+// Audit logging middleware - logs all requests/responses
+app.use(auditLogger);
+
+// License validation middleware - validates API keys
+app.use(licenseValidator);
 
 // Request logging middleware
 app.use((req, res, next) => {
