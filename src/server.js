@@ -5,6 +5,7 @@
 
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const db = require('./db/oracleClient');
 const guestRoutes = require('./routes/guestRoutes');
 const licenseValidator = require('./middleware/licenseValidator');
@@ -12,6 +13,33 @@ const auditLogger = require('./middleware/auditLogger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS Configuration
+const allowedOrigins = [
+    'http://10.0.10.31',
+    'http://localhost:3000',
+    'http://localhost:5173' // Common Vite dev port
+];
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
