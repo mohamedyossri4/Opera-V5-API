@@ -20,14 +20,16 @@ let pool = null;
 async function initialize() {
   try {
     console.log('Initializing Oracle connection pool...');
+    console.log('DEBUG: Attempting to enable Thick mode...');
 
     // Enable Thick mode for Oracle 11g support
-    try {
-      oracledb.initOracleClient({ libDir: process.env.LD_LIBRARY_PATH });
-      console.log('Oracle Client initialized (Thick mode enabled)');
-    } catch (err) {
-      console.warn('Oracle Client initialization skipped (already initialized or not found):', err.message);
-    }
+    // We explicitly pass libDir only if LD_LIBRARY_PATH is set (Linux/Docker)
+    // On Windows, we expect Instant Client in PATH
+    const initOptions = process.env.LD_LIBRARY_PATH ? { libDir: process.env.LD_LIBRARY_PATH } : {};
+
+    oracledb.initOracleClient(initOptions);
+    console.log('Oracle Client initialized (Thick mode enabled)');
+
 
     pool = await oracledb.createPool({
       user: process.env.ORACLE_USER,
