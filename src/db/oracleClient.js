@@ -20,7 +20,15 @@ let pool = null;
 async function initialize() {
   try {
     console.log('Initializing Oracle connection pool...');
-    
+
+    // Enable Thick mode for Oracle 11g support
+    try {
+      oracledb.initOracleClient({ libDir: process.env.LD_LIBRARY_PATH });
+      console.log('Oracle Client initialized (Thick mode enabled)');
+    } catch (err) {
+      console.warn('Oracle Client initialization skipped (already initialized or not found):', err.message);
+    }
+
     pool = await oracledb.createPool({
       user: process.env.ORACLE_USER,
       password: process.env.ORACLE_PASSWORD,
